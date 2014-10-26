@@ -5,6 +5,11 @@
 # Copyright 2014, Robert S. Reis
 #
 
+execute 'Bundler setup' do
+  command 'gem install bundler && bundler install'
+  cwd node['rails']['root']
+end
+
 include_recipe 'nginx'
 
 cookbook_file 'unicorn.sh' do
@@ -27,7 +32,7 @@ template '/etc/unicorn/rails.conf' do
   source 'unicorn.conf.erb'
   variables rails_env: node['rails']['env'],
             rails_root: node['rails']['root']
-  notifies :restart, 'service[unicorn]'
+  notifies :start, 'service[unicorn]'
 end
 
 template '/etc/nginx/sites-enabled/rails.conf' do
@@ -35,7 +40,5 @@ template '/etc/nginx/sites-enabled/rails.conf' do
   variables sock_path: node['unicorn']['sock_path'],
             rails_root: node['rails']['root'],
             server_name: node['nginx']['server_name']
-  notifies :restart, 'service[nginx]'
+  notifies :start, 'service[nginx]'
 end
-
-%w( unicorn nginx ).each { |s| service s }
