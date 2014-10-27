@@ -10,6 +10,11 @@ execute 'bundler' do
   cwd node['rails']['root']
 end
 
+file 'unicorn_pid' do
+  path node['unicorn']['pid_path']
+  action :delete
+end
+
 execute 'unicorn' do
   command "unicorn_rails -c config/unicorn.rb -E #{node['rails']['env']} -D"
   cwd node['rails']['root']
