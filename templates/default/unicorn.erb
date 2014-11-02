@@ -47,26 +47,12 @@ cmd () {
 }
 
 setup () {
-  echo -n "$RAILS_ROOT: "
-  cd $RAILS_ROOT || exit 1
-  export PID=$RAILS_ROOT/tmp/pids/unicorn.pid
+  echo -n "unicorn: "
+  cd <%= @rails_root %> || exit 1
+  export PID=<%= @pid_path %>
   export OLD_PID="$PID.oldbin"
-  CMD="unicorn_rails -c config/unicorn.rb -E $RAILS_ENV -D"
+  CMD="unicorn_rails -c config/unicorn.rb -E <%= @rails_env %> -D"
 }
 
-start_stop () {
-  if [ $2 ]; then
-    . $2
-    setup
-    cmd $1
-  else
-    for CONFIG in /etc/unicorn/*.conf; do
-      . $CONFIG
-      setup
-      cmd $1
-    done
-   fi
-}
-
-ARGS="$1 $2"
-start_stop $ARGS
+setup
+cmd $1
